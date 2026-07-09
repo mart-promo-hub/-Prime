@@ -2,26 +2,32 @@
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const [status, setStatus] = useState("جاري التحقق من الاتصال بـ Pi SDK...");
+  const [connectionStatus, setConnectionStatus] = useState("جاري فحص الاتصال ببيئة Pi...");
 
   useEffect(() => {
-    // وظيفة للتحقق المتكرر من وجود SDK
-    const checkSDK = () => {
+    // دالة للتحقق من وجود مكتبة Pi SDK
+    const checkPiConnection = () => {
+      // التحقق من وجود الكائن window.Pi
       if (typeof window !== 'undefined' && window.Pi) {
-        setStatus("تم الاتصال بـ Pi بنجاح! جاهز للبدء.");
+        setConnectionStatus("✅ تم الاتصال بـ Pi بنجاح! التطبيق جاهز.");
       } else {
-        // إذا لم يتم العثور عليه، ننتظر 500 ملي ثانية ونعيد المحاولة
-        setTimeout(checkSDK, 500);
+        // إذا لم يظهر، ننتظر نصف ثانية ونحاول مرة أخرى
+        setTimeout(checkPiConnection, 500);
       }
     };
 
-    checkSDK();
+    checkPiConnection();
   }, []);
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
-      <h1>πPrime AI</h1>
-      <p style={{ marginTop: '20px', color: '#333' }}>{status}</p>
+    <div style={{ padding: '30px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
+      <h1 style={{ color: '#5C338A' }}>πPrime AI</h1>
+      <p style={{ marginTop: '20px', fontSize: '18px', fontWeight: 'bold' }}>
+        {connectionStatus}
+      </p>
+      <div style={{ marginTop: '20px', color: '#777' }}>
+        استضافتك تعمل بشكل مستقر الآن.
+      </div>
     </div>
   );
 }
