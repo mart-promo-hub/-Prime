@@ -2,38 +2,26 @@
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const [isPiReady, setIsPiReady] = useState(false);
-  const [message, setMessage] = useState("جاري فحص اتصال Pi SDK...");
+  const [status, setStatus] = useState("جاري التحقق من الاتصال بـ Pi SDK...");
 
   useEffect(() => {
-    // دالة للتحقق من وجود الـ Pi SDK
-    const checkPi = () => {
+    // وظيفة للتحقق المتكرر من وجود SDK
+    const checkSDK = () => {
       if (typeof window !== 'undefined' && window.Pi) {
-        setIsPiReady(true);
-        setMessage("تم الاتصال بـ Pi بنجاح! التطبيق يعمل الآن.");
+        setStatus("تم الاتصال بـ Pi بنجاح! جاهز للبدء.");
       } else {
-        // إذا لم يتم العثور عليه، ننتظر قليلاً ونحاول مرة أخرى
-        setTimeout(checkPi, 1000); 
+        // إذا لم يتم العثور عليه، ننتظر 500 ملي ثانية ونعيد المحاولة
+        setTimeout(checkSDK, 500);
       }
     };
 
-    checkPi();
+    checkSDK();
   }, []);
 
   return (
-    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ color: '#5C338A' }}>πPrime AI</h1>
-      <p style={{ fontSize: '18px', marginTop: '20px' }}>{message}</p>
-      
-      {isPiReady ? (
-        <div style={{ marginTop: '30px', padding: '20px', border: '1px solid green' }}>
-          ✅ اتصال آمن ومستقر. يمكنك الآن البدء بإضافة الميزات.
-        </div>
-      ) : (
-        <div style={{ marginTop: '30px', color: '#ff9800' }}>
-          ⏳ يرجى الانتظار، جاري الربط مع شبكة Pi...
-        </div>
-      )}
+    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+      <h1>πPrime AI</h1>
+      <p style={{ marginTop: '20px', color: '#333' }}>{status}</p>
     </div>
   );
 }
