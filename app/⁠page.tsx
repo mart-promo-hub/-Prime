@@ -1,33 +1,97 @@
 "use client";
-import { useEffect, useState } from 'react';
+
+import { usePi } from "@/components/PiProvider";
+import { useState } from "react";
 
 export default function Home() {
-  const [connectionStatus, setConnectionStatus] = useState("جاري فحص الاتصال ببيئة Pi...");
+  const { ready } = usePi();
 
-  useEffect(() => {
-    // دالة للتحقق من وجود مكتبة Pi SDK
-    const checkPiConnection = () => {
-      // التحقق من وجود الكائن window.Pi
-      if (typeof window !== 'undefined' && window.Pi) {
-        setConnectionStatus("✅ تم الاتصال بـ Pi بنجاح! التطبيق جاهز.");
-      } else {
-        // إذا لم يظهر، ننتظر نصف ثانية ونحاول مرة أخرى
-        setTimeout(checkPiConnection, 500);
+  const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState<string>("");
+
+  async function loginWithPi() {
+    setError("");
+
+    try {
+      if (!window.Pi) {
+        throw new Error("Pi SDK غير محمل");
       }
-    };
 
-    checkPiConnection();
-  }, []);
+      const scopes = ["username"];
+
+      const auth = await window.Pi.authenticate(
+        scopes,
+        (payment: any) => {
+          console.log("Payment callback:", payment);
+        }
+      );
+
+      console.log("Pi Auth:", auth);
+
+      setUser(auth.user);
+
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "فشل تسجيل الدخول بواسطة Pi");
+    }
+  }
+
+
+  if (!ready) {
+    return (
+      <main style={{ padding: 30 }}>
+        <h2>
+          جاري تحميل Pi SDK...
+        </h2>
+      </main>
+    );
+  }
+
 
   return (
-    <div style={{ padding: '30px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ color: '#5C338A' }}>πPrime AI</h1>
-      <p style={{ marginTop: '20px', fontSize: '18px', fontWeight: 'bold' }}>
-        {connectionStatus}
-      </p>
-      <div style={{ marginTop: '20px', color: '#777' }}>
-        استضافتك تعمل بشكل مستقر الآن.
-      </div>
-    </div>
+    <main style={{ padding: 30 }}>
+
+      <h1>
+        πPrime AI
+      </h1>
+
+
+      {!user ? (
+
+        <button
+          onClick={loginWithPi}
+          style={{
+            padding: "12px 20px",
+            borderRadius: "8px",
+            cursor: "pointer"
+          }}
+        >
+          تسجيل الدخول بواسطة Pi
+        </button>
+
+      ) : (
+
+        <div>
+
+          <h2>
+            مرحباً {user.username}
+          </h2>
+
+          <p>
+            تم تسجيل الدخول بنجاح بواسطة Pi Network
+          </p>
+
+        </div>
+
+      )}
+
+
+      {error && (
+        <p style={{ color: "red" }}>
+          {error}
+        </p>
+      )}
+
+    </main>
   );
 }
