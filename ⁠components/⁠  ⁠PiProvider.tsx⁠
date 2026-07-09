@@ -1,27 +1,54 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from 'react';
+
+import { createContext, useContext, useEffect, useState } from "react";
 
 const PiContext = createContext<any>(null);
 
-export function PiProvider({ children }: { children: React.ReactNode }) {
-  const [pi, setPi] = useState<any>(null);
-  const [isReady, setIsReady] = useState(false);
+export function PiProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // محاولة الاتصال بالـ SDK بمرونة
+
     const initPi = () => {
-      if (typeof window !== 'undefined' && (window as any).Pi) {
-        setPi((window as any).Pi);
+
+      if (window.Pi) {
+
+        window.Pi.init({
+          version: "2.0",
+          sandbox: true
+        });
+
+        setReady(true);
+
       }
-      setIsReady(true);
+
     };
 
-    // انتظار بسيط لضمان تحميل الـ SDK الخاص بـ Pi
-    const timer = setTimeout(initPi, 1000);
-    return () => clearTimeout(timer);
+
+    const timer = setInterval(initPi,500);
+
+
+    return () => clearInterval(timer);
+
+
   }, []);
 
-  return <PiContext.Provider value={{ pi, isReady }}>{children}</PiContext.Provider>;
+
+  return (
+    <PiContext.Provider value={{ready}}>
+      {children}
+    </PiContext.Provider>
+  );
 }
 
-export const usePi = () => useContext(PiContext);
+
+export function usePi(){
+
+ return useContext(PiContext);
+
+}
