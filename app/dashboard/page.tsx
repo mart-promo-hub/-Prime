@@ -17,9 +17,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* رأس الصفحة */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">📊 Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">📊 πPrime AI Dashboard</h1>
           <Link
             href="/campaign/create"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -28,7 +27,6 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* بطاقات الإحصائيات */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
             <p className="text-gray-500 text-sm">📋 Total Campaigns</p>
@@ -48,7 +46,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* النشاط الأخير */}
         <div className="mt-8 bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">🕒 Recent Activity</h2>
           <div className="space-y-3">
