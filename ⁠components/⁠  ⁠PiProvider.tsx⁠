@@ -1,54 +1,116 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-const PiContext = createContext<any>(null);
+declare global {
+  interface Window {
+    Pi?: any;
+  }
+}
+
+type PiContextType = {
+  ready: boolean;
+  pi: any | null;
+};
+
+const PiContext = createContext<PiContextType>({
+  ready: false,
+  pi: null,
+});
 
 export function PiProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   const [ready, setReady] = useState(false);
+  const [pi, setPi] = useState<any>(null);
 
   useEffect(() => {
+    let cancelled = false;
 
-    const initPi = () => {
+    async function initialize() {
+      try {
+        if (typeof window === "undefined") return;
 
-      if (window.Pi) {
+        const checkSDK = () => {
+          const sdk = window.Pi;
 
-        window.Pi.init({
-          version: "2.0",
-          sandbox: true
-        });
+          if (!sdk) {
+            return false;
+          }
 
-        setReady(true);
+          try {
+            sdk.init({
+              version: "2.0",
+              sandbox: true,
+            });
 
+            if (!cancelled) {
+              setPi(sdk);
+              setReady(true);
+            }
+
+            return true;
+          } catch (err) {
+            console.error("Pi.init failed:", err);
+
+            if (!cancelled) {
+              setReady(true);
+            }
+
+            return true;
+          }
+        };
+
+        if (checkSDK()) return;
+
+        let attempts = 0;
+
+        const interval = setInterval(() => {
+          attempts++;
+
+          if (checkSDK() || attempts >= 20) {
+            clearInterval(interval);
+
+            if (!cancelled) {
+              setReady(true);
+            }
+          }
+        }, 500);
+      } catch (err) {
+        console.error(err);
+
+        if (!cancelled) {
+          setReady(true);
+        }
       }
+    }
 
+    initialize();
+
+    return () => {
+      cancelled = true;
     };
-
-
-    const timer = setInterval(initPi,500);
-
-
-    return () => clearInterval(timer);
-
-
   }, []);
 
-
   return (
-    <PiContext.Provider value={{ready}}>
+    <PiContext.Provider
+      value={{
+        ready,
+        pi,
+      }}
+    >
       {children}
     </PiContext.Provider>
   );
 }
 
-
-export function usePi(){
-
- return useContext(PiContext);
-
+export function usePi() {
+  return useContext(PiContext);
 }
