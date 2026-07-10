@@ -1,9 +1,13 @@
-import Script from "next/script";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { PiProvider } from "@/components/providers/PiProvider";
 
-export const metadata = {
-  title: "πPrime AI",
-  description: "AI Platform powered by Pi Network",
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Prime AI - Pi Ecosystem",
+  description: "AI-Powered Promotion Platform for Pi Ecosystem",
 };
 
 export default function RootLayout({
@@ -12,16 +16,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl">
-      <body>
-
-        <Script
-          src="https://sdk.minepi.com/pi-sdk.js"
-          strategy="beforeInteractive"
-        />
-
-        {children}
-
+    <html lang="en">
+      <head>
+        <script src="https://sdk.pi.app/pi.min.js" async />
+      </head>
+      <body className={inter.className}>
+        <PiProvider>
+          {children}
+        </PiProvider>
       </body>
     </html>
   );
